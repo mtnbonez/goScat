@@ -58,6 +58,6 @@ func (client LocalClient) Connect() bool {
 func (client LocalClient) GetInput() string {
 	// Here's where we interface with the UI?
 	var input string
-	fmt.Scanln(&input)
+	fmt.Scanln(&input) ///START HERE!
 	return input
 }

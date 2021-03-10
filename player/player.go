@@ -22,6 +22,9 @@ type Player struct {
 	// Honor represents the final life after your coins are gone
 	Honor bool
 
+	// Knocked represents the player triggering end-game
+	Knocked bool
+
 	// Client interface object for connect
 	Client client.Client
 
@@ -33,13 +36,29 @@ type Player struct {
 }
 
 func AddCardToHand(player *Player, card card.Card) {
+	//fmt.Printf("Current hand... %q\n", player.Hand)
 	player.Hand = append(player.Hand, card)
 }
 
+func DisplayHand(player *Player) {
+	fmt.Printf("Player hand:\n")
+	for i := range player.Hand {
+		currCard := player.Hand[i]
+		fmt.Printf("\t%q%q (%d)", currCard.Suit, currCard.Face, currCard.Value)
+	}
+	fmt.Println()
+}
+
 func GetPlay(player *Player) {
+
+	DisplayHand(player)
+
 	retryPlay := false
 	input := player.Client.GetInput()
 	splits := strings.Split(input, " ")
+
+	fmt.Printf("Input: %v", input)
+	fmt.Printf("Input: %v", splits)
 
 	var currPlay Play
 	switch player.PlayPhase {
@@ -51,9 +70,14 @@ func GetPlay(player *Player) {
 				{
 					drawDeck = splits[1]
 				}
+			case "knock":
+				{
+					fmt.Printf("%q just knocked!!!", player.Name)
+					player.Knocked = true
+				}
 			default:
 				{
-					fmt.Printf("Incorrect option! Retry play!\n")
+					fmt.Printf("Incorrect draw, split[1]! Retry play!\n")
 					retryPlay = true
 				}
 			}

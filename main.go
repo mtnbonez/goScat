@@ -41,29 +41,37 @@ func main() {
 
 	//fmt.Printf("%+v", testGame)
 
+	// Connect players 
+	game.ConnectPlayers(&testGame)
+
 	// Start game
-
-	//start here!!!
+	
 	game.Deal(&testGame)
+	game.StartGame(&testGame)
 
-	// first draws
-	// choose first player (just pick first element right now)
 
 	// Check for finish
-	/*
-		for {
-
-			if testGame.GameState != game.Report {
-				break
-			}
-
-			// Process input
-
-			// Process game
-
-			// Process status
-
+	for {
+		if testGame.GameState == game.Ending {
+			break
 		}
-	*/
+		
+		// Display game board
+		game.Display(&testGame)
+
+		// Process input
+		game.Play(&testGame)
+
+		// Process game
+		// Any Scats? 
+
+		// Process status
+
+
+		// psst, this is broke on purpose
+		
+
+	}
+	
 
 }

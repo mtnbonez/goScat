@@ -17,6 +17,7 @@ const (
 	Initializing           = iota + 1
 	Ready                  = iota + 1
 	Connecting             = iota + 1
+	Connected			   = iota + 1
 	Playing                = iota + 1
 	Ending                 = iota + 1
 	Report                 = iota + 1
@@ -51,7 +52,7 @@ type Game struct {
 }
 
 func CreateGame(game *Game) {
-	if game.GameState >= Creating {
+	if game.GameState == Creating {
 		fmt.Printf("Game already being created!\n\n%+v\n\n", &game)
 		game.GameState = Error
 		return
@@ -69,7 +70,7 @@ func CreateGame(game *Game) {
 }
 
 func InitializeGame(game *Game, players []player.Player) {
-	if game.GameState >= Initializing {
+	if game.GameState == Initializing {
 		fmt.Printf("Game already initializing!\n\n%+v\n\n", &game)
 		game.GameState = Error
 		return
@@ -128,8 +129,10 @@ func InitializePlayers(game *Game, players []player.Player) {
 
 	fmt.Printf("Initializing players...\n")
 
-	for _, s := range players {
-		AddPlayer(game, &s)
+	for i := range players {
+		currPlayer := &players[i]
+		currPlayer.PlayPhase = player.DrawPhase
+		AddPlayer(game, &players[i])
 	}
 }
 
@@ -137,8 +140,61 @@ func AddPlayer(game *Game, player *player.Player) {
 	game.Players = append(game.Players, *player)
 }
 
-func Deal(game *Game) {
+// ConnectPlayers attaches game clients to server
+func ConnectPlayers(game *Game) {
+	if game.GameState != Ready {
+		fmt.Printf("Game not ready!\n\n%+v\n\n", &game)
+		game.GameState = Error
+		return
+	}
 
+	game.GameState = Connecting
+
+	for _, x := range game.Players {
+		fmt.Printf("Connecting %+v\n", x.Name)
+		if !x.Client.Connect() {
+			fmt.Printf("Player %+v could not connect!\n", x.Name)
+			return 
+		} else {
+			fmt.Printf("%+v connected!\n", x.Name)
+		}
+	}
+
+	game.GameState = Connected
+}
+
+// StartGame kicks the game off!
+func StartGame(game *Game) {
+	if game.GameState != Connected {
+		fmt.Printf("Game players not connected!\n\n%+v\n\n", &game)
+		game.GameState = Error
+		return
+	}
+
+	game.GameState = Playing
+	fmt.Printf("Game now playing!\n")
+
+	// Select first player to go first 
+	game.CurrentPlayerTurn = &game.Players[0]
+	game.TurnNumber = 1
+}
+
+// Deal out cards to players at the start of the game 
+func Deal(game *Game) {
+	for i := range game.Players {
+		Draw(game, &game.Players[i], "draw")
+		Draw(game, &game.Players[i], "draw")
+		Draw(game, &game.Players[i], "draw")
+	}
+
+	fmt.Printf("First hands dealt!\n")
+	for _, x := range game.Players {
+		fmt.Printf("%q's hand: %q\n", x.Name, x.Hand)
+	}
+
+	// Discard first card from deck
+	cardToDiscard := deck.Draw(&game.DrawDeck)
+	deck.Discard(&game.DiscardDeck, &cardToDiscard)
 }
 
 func Draw(game *Game, p *player.Player, deckName string) {
@@ -161,5 +217,46 @@ func Draw(game *Game, p *player.Player, deckName string) {
 	}
 
 	var cardPulled = deck.Draw(deckChoice)
+	//fmt.Printf("Card pulled: %q%q (%d)\n", cardPulled.Face, cardPulled.Suit, cardPulled.Value)
 	player.AddCardToHand(p, cardPulled)
 }
+
+// Display should really go to it's own implementation
+func Display(game *Game) {
+	const border = "============================================"
+	fmt.Println(border)
+
+	fmt.Printf("\tTurn: %d\n", game.TurnNumber)
+	fmt.Printf("\tCurrPlayer: %q\n", game.CurrentPlayerTurn.Name)
+
+	topCard := game.DiscardDeck.Cards[0]
+	fmt.Printf("\tDicard Pile: %q%q (%d)\n", topCard.Suit, topCard.Face, topCard.Value)
+
+	fmt.Println(border)
+
+}
+
+func Play(game *Game) {
+	if game.CurrentPlayerTurn == nil {
+		fmt.Printf("No player selected!\n\n%+v\n\n", &game)
+		game.GameState = Error
+		return
+	}
+
+	player.GetPlay(game.CurrentPlayerTurn)
+
+
+	switch game.CurrentPlayerTurn.PlayPhase {
+	case player.DrawPhase: 
+		{
+
+			game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
+		}
+	}
+
+}
+
+func Process(game *Game) {
+	game.TurnNumber++
+}
+
