@@ -228,6 +228,9 @@ func Display(game *Game) {
 
 	fmt.Printf("\tTurn: %d\n", game.TurnNumber)
 	fmt.Printf("\tCurrPlayer: %q\n", game.CurrentPlayerTurn.Name)
+	fmt.Printf("\tDrawDeckSize: %d\n", len(game.DrawDeck.Cards))
+	fmt.Printf("\tDiscardDeckSize: %d\n", len(game.DiscardDeck.Cards))
+
 
 	topCard := game.DiscardDeck.Cards[0]
 	fmt.Printf("\tDicard Pile: %q%q (%d)\n", topCard.Suit, topCard.Face, topCard.Value)
@@ -244,7 +247,6 @@ func Play(game *Game) {
 	}
 
 	player.GetPlay(game.CurrentPlayerTurn)
-
 
 	switch game.CurrentPlayerTurn.PlayPhase {
 	case player.DrawPhase: 
