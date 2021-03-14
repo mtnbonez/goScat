@@ -6,7 +6,7 @@ type Card struct {
 	Face string
 
 	// Suit is the class designation (e.g.: diamond, spade, etc.)
-	Suit rune
+	Suit string
 
 	// Value represents how many points the card is worth
 	Value int

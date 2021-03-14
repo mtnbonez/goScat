@@ -53,6 +53,21 @@ func GetPlay(player *Player) {
 
 	DisplayHand(player)
 
+	switch player.PlayPhase {
+	case DrawPhase:
+		{
+			fmt.Printf("Options: \"draw <deck>\" or \"knock\"!\n")
+		}
+	case DiscardPhase:
+		{
+			fmt.Printf("Options: \"discard <card>\"\n")
+		}
+	default:
+		{
+			fmt.Printf("Incorrect phase! This shouldn't happen!\n")
+		}
+	}
+
 	retryPlay := false
 	input := player.Client.GetInput()
 	splits := strings.Split(input, " ")
@@ -69,11 +84,13 @@ func GetPlay(player *Player) {
 			case "draw":
 				{
 					drawDeck = splits[1]
+					currPlay.PlayOption = DrawOption
 				}
 			case "knock":
 				{
-					fmt.Printf("%q just knocked!!!", player.Name)
+					fmt.Printf("%q just knocked!!!\n", player.Name)
 					player.Knocked = true
+					currPlay.PlayOption = KnockOption
 				}
 			default:
 				{
@@ -82,7 +99,6 @@ func GetPlay(player *Player) {
 				}
 			}
 			currPlay.Deck = drawDeck
-			currPlay.PlayOption = DrawOption
 		}
 	case DiscardPhase:
 		{
@@ -93,9 +109,8 @@ func GetPlay(player *Player) {
 			}
 
 			// TODO - validate!
-			var cardName = splits[1]
-			var suit = rune(cardName[0])
-			var face = string(cardName[1])
+			var suit = string(splits[1])
+			var face = string(splits[2])
 
 			currPlay.Card = card.Card{
 				Face: face,
@@ -131,6 +146,7 @@ type PlayOption int
 
 const (
 	DrawOption    PlayOption = iota + 1
+	KnockOption              = iota + 1
 	DiscardOption            = iota + 1
 )
 

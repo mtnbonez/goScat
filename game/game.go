@@ -233,7 +233,7 @@ func Display(game *Game) {
 
 
 	topCard := game.DiscardDeck.Cards[0]
-	fmt.Printf("\tDicard Pile: %q%q (%d)\n", topCard.Suit, topCard.Face, topCard.Value)
+	fmt.Printf("\tDiscard Pile: %q%q (%d)\n", topCard.Suit, topCard.Face, topCard.Value)
 
 	fmt.Println(border)
 
@@ -251,8 +251,13 @@ func Play(game *Game) {
 	switch game.CurrentPlayerTurn.PlayPhase {
 	case player.DrawPhase: 
 		{
-
+			// KEEP GOING FROM HERE
+			if (game.CurrentPlayerTurn.Plays[0].PlayOption)
 			game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
+		}
+	case player.DiscardPhase:
+		{
+			game.CurrentPlayerTurn.PlayPhase = player.EndPhase
 		}
 	}
 
