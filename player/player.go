@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// ===================================================================
+//
 type Player struct {
 
 	// Name of the player
@@ -35,11 +37,15 @@ type Player struct {
 	PlayPhase PlayPhase
 }
 
+// ===================================================================
+//
 func AddCardToHand(player *Player, card card.Card) {
 	//fmt.Printf("Current hand... %q\n", player.Hand)
 	player.Hand = append(player.Hand, card)
 }
 
+// ===================================================================
+//
 func DisplayHand(player *Player) {
 	fmt.Printf("Player hand:\n")
 	for i := range player.Hand {
@@ -49,6 +55,8 @@ func DisplayHand(player *Player) {
 	fmt.Println()
 }
 
+// ===================================================================
+//
 func GetPlay(player *Player) {
 
 	DisplayHand(player)
@@ -62,9 +70,13 @@ func GetPlay(player *Player) {
 		{
 			fmt.Printf("Options: \"discard <card>\"\n")
 		}
+	case EndPhase:
+		{
+			// D
+		}
 	default:
 		{
-			fmt.Printf("Incorrect phase! This shouldn't happen!\n")
+			fmt.Printf("Incorrect phase! This shouldn't happen!\n%v\n\n", player.PlayPhase)
 		}
 	}
 
@@ -72,8 +84,8 @@ func GetPlay(player *Player) {
 	input := player.Client.GetInput()
 	splits := strings.Split(input, " ")
 
-	fmt.Printf("Input: %v", input)
-	fmt.Printf("Input: %v", splits)
+	fmt.Printf("Input: %v\n", input)
+	fmt.Printf("Splits: %v\n", splits)
 
 	var currPlay Play
 	switch player.PlayPhase {
@@ -134,6 +146,18 @@ func GetPlay(player *Player) {
 	player.Plays = append(player.Plays, currPlay)
 }
 
+// ===================================================================
+//
+func GetHandValue(player *Player) int {
+	sum := 0
+	for _, x := range player.Hand {
+		sum = sum + x.Value
+	}
+	return sum
+}
+
+// ===================================================================
+//
 type PlayPhase int
 
 const (
@@ -142,6 +166,8 @@ const (
 	EndPhase               = iota + 1
 )
 
+// ===================================================================
+//
 type PlayOption int
 
 const (
@@ -150,6 +176,8 @@ const (
 	DiscardOption            = iota + 1
 )
 
+// ===================================================================
+//
 type Play struct {
 	PlayOption PlayOption
 	Card       card.Card

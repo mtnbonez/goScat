@@ -33,29 +33,28 @@ func main() {
 		Client: client.LocalClient{},
 	}
 
-	Players := make([]player.Player, 2)
-	Players[0] = Player1
-	Players[1] = Player2
+	Players := make([]*player.Player, 2)
+	Players[0] = &Player1
+	Players[1] = &Player2
 
 	game.InitializeGame(&testGame, Players)
 
 	//fmt.Printf("%+v", testGame)
 
-	// Connect players 
+	// Connect players
 	game.ConnectPlayers(&testGame)
 
 	// Start game
-	
+
 	game.Deal(&testGame)
 	game.StartGame(&testGame)
-
 
 	// Check for finish
 	for {
 		if testGame.GameState == game.Ending {
 			break
 		}
-		
+
 		// Display game board
 		game.Display(&testGame)
 
@@ -63,15 +62,14 @@ func main() {
 		game.Play(&testGame)
 
 		// Process game
-		// Any Scats? 
+		game.Process(&testGame)
+
+		// Any Scats?
 
 		// Process status
 
-
 		// psst, this is broke on purpose
-		
 
 	}
-	
 
 }

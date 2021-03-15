@@ -42,7 +42,7 @@ func Shuffle(d *Deck) {
 func Print(d *Deck) {
 	fmt.Printf("%q\n", d.Name)
 	for i, v := range d.Cards {
-		fmt.Printf("[%d] %q%c\n", i, v.Face, v.Suit)
+		fmt.Printf("[%d] %q%q\n", i, v.Face, v.Suit)
 	}
 }
 

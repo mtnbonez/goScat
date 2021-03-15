@@ -1,7 +1,6 @@
 package goscatgame
 
 import (
-	"container/list"
 	"fmt"
 	deck "goscat/deck"
 	player "goscat/player"
@@ -9,6 +8,8 @@ import (
 	"github.com/google/uuid"
 )
 
+// ===================================================================
+//
 type GameState int
 
 const (
@@ -17,20 +18,22 @@ const (
 	Initializing           = iota + 1
 	Ready                  = iota + 1
 	Connecting             = iota + 1
-	Connected			   = iota + 1
+	Connected              = iota + 1
 	Playing                = iota + 1
 	Ending                 = iota + 1
 	Report                 = iota + 1
 	Error                  = iota + 1
 )
 
+// ===================================================================
+//
 type Game struct {
 
 	// UUID of the game (could use for secret initially?)
 	ID uuid.UUID
 
 	// Players in the game
-	Players []player.Player
+	Players []*player.Player
 
 	// TurnNumber that the game is currently on
 	TurnNumber int
@@ -39,7 +42,7 @@ type Game struct {
 	GameState GameState
 
 	// TurnOrder for players
-	TurnOrder list.List
+	TurnOrder []*player.Player
 
 	// CurrentPlayerTurn notes who's turn it is (used for validation)
 	CurrentPlayerTurn *player.Player
@@ -49,8 +52,14 @@ type Game struct {
 
 	// DiscardDeck used for discarding (top is revealed)
 	DiscardDeck deck.Deck
+
+	// PlayerHasKnocked keeps track of who knocked
+	// Might be able to take the logic out of Player if we use a pointer?
+	PlayerHasKnocked bool
 }
 
+// ===================================================================
+//
 func CreateGame(game *Game) {
 	if game.GameState == Creating {
 		fmt.Printf("Game already being created!\n\n%+v\n\n", &game)
@@ -69,7 +78,9 @@ func CreateGame(game *Game) {
 	fmt.Printf("Game %v created!\n", game.ID)
 }
 
-func InitializeGame(game *Game, players []player.Player) {
+// ===================================================================
+//
+func InitializeGame(game *Game, players []*player.Player) {
 	if game.GameState == Initializing {
 		fmt.Printf("Game already initializing!\n\n%+v\n\n", &game)
 		game.GameState = Error
@@ -87,6 +98,8 @@ func InitializeGame(game *Game, players []player.Player) {
 
 }
 
+// ===================================================================
+//
 func InitializeDecks(game *Game) {
 	if game.GameState != Initializing {
 		fmt.Printf("Game not initializing!\n\n%+v\n\n", &game)
@@ -125,22 +138,29 @@ func InitializeDecks(game *Game) {
 
 }
 
-func InitializePlayers(game *Game, players []player.Player) {
+// ===================================================================
+//
+func InitializePlayers(game *Game, players []*player.Player) {
 
 	fmt.Printf("Initializing players...\n")
 
 	for i := range players {
-		currPlayer := &players[i]
+		currPlayer := players[i]
 		currPlayer.PlayPhase = player.DrawPhase
-		AddPlayer(game, &players[i])
+		AddPlayer(game, players[i])
 	}
 }
 
+// ===================================================================
+//
 func AddPlayer(game *Game, player *player.Player) {
-	game.Players = append(game.Players, *player)
+	game.Players = append(game.Players, player)
+	game.TurnOrder = append(game.TurnOrder, player)
 }
 
 // ConnectPlayers attaches game clients to server
+// ===================================================================
+//
 func ConnectPlayers(game *Game) {
 	if game.GameState != Ready {
 		fmt.Printf("Game not ready!\n\n%+v\n\n", &game)
@@ -154,7 +174,7 @@ func ConnectPlayers(game *Game) {
 		fmt.Printf("Connecting %+v\n", x.Name)
 		if !x.Client.Connect() {
 			fmt.Printf("Player %+v could not connect!\n", x.Name)
-			return 
+			return
 		} else {
 			fmt.Printf("%+v connected!\n", x.Name)
 		}
@@ -164,6 +184,8 @@ func ConnectPlayers(game *Game) {
 }
 
 // StartGame kicks the game off!
+// ===================================================================
+//
 func StartGame(game *Game) {
 	if game.GameState != Connected {
 		fmt.Printf("Game players not connected!\n\n%+v\n\n", &game)
@@ -174,22 +196,24 @@ func StartGame(game *Game) {
 	game.GameState = Playing
 	fmt.Printf("Game now playing!\n")
 
-	// Select first player to go first 
-	game.CurrentPlayerTurn = &game.Players[0]
+	// Select first player to go first
+	game.CurrentPlayerTurn = game.Players[0]
 	game.TurnNumber = 1
 }
 
-// Deal out cards to players at the start of the game 
+// Deal out cards to players at the start of the game
+// ===================================================================
+//
 func Deal(game *Game) {
 	for i := range game.Players {
-		Draw(game, &game.Players[i], "draw")
-		Draw(game, &game.Players[i], "draw")
-		Draw(game, &game.Players[i], "draw")
+		Draw(game, game.Players[i], "draw")
+		Draw(game, game.Players[i], "draw")
+		Draw(game, game.Players[i], "draw")
 	}
 
 	fmt.Printf("First hands dealt!\n")
 	for _, x := range game.Players {
-		fmt.Printf("%q's hand: %q\n", x.Name, x.Hand)
+		fmt.Printf("%q's hand: %v\n", x.Name, x.Hand)
 	}
 
 	// Discard first card from deck
@@ -197,6 +221,8 @@ func Deal(game *Game) {
 	deck.Discard(&game.DiscardDeck, &cardToDiscard)
 }
 
+// ===================================================================
+//
 func Draw(game *Game, p *player.Player, deckName string) {
 
 	var deckChoice *deck.Deck
@@ -217,21 +243,25 @@ func Draw(game *Game, p *player.Player, deckName string) {
 	}
 
 	var cardPulled = deck.Draw(deckChoice)
-	//fmt.Printf("Card pulled: %q%q (%d)\n", cardPulled.Face, cardPulled.Suit, cardPulled.Value)
+	fmt.Printf("Card pulled: %q%q (%d)\n", cardPulled.Suit, cardPulled.Face, cardPulled.Value)
 	player.AddCardToHand(p, cardPulled)
 }
 
 // Display should really go to it's own implementation
+// ===================================================================
+//
 func Display(game *Game) {
 	const border = "============================================"
 	fmt.Println(border)
 
-	fmt.Printf("\tTurn: %d\n", game.TurnNumber)
+	fmt.Printf("\tTurn: %d\n\n", game.TurnNumber)
+
 	fmt.Printf("\tCurrPlayer: %q\n", game.CurrentPlayerTurn.Name)
+	fmt.Printf("\tPlayerHandValue: %d\n", player.GetHandValue(game.CurrentPlayerTurn))
+	fmt.Printf("\tPlayPhase: %+v\n\n", game.CurrentPlayerTurn.PlayPhase)
+
 	fmt.Printf("\tDrawDeckSize: %d\n", len(game.DrawDeck.Cards))
 	fmt.Printf("\tDiscardDeckSize: %d\n", len(game.DiscardDeck.Cards))
-
-
 	topCard := game.DiscardDeck.Cards[0]
 	fmt.Printf("\tDiscard Pile: %q%q (%d)\n", topCard.Suit, topCard.Face, topCard.Value)
 
@@ -239,6 +269,8 @@ func Display(game *Game) {
 
 }
 
+// ===================================================================
+//
 func Play(game *Game) {
 	if game.CurrentPlayerTurn == nil {
 		fmt.Printf("No player selected!\n\n%+v\n\n", &game)
@@ -246,14 +278,33 @@ func Play(game *Game) {
 		return
 	}
 
+	if game.CurrentPlayerTurn.PlayPhase == player.EndPhase {
+		// Switch to new player
+		game.TurnOrder = append(game.TurnOrder[1:], game.CurrentPlayerTurn)
+		game.CurrentPlayerTurn = game.TurnOrder[0]
+		game.CurrentPlayerTurn.PlayPhase = player.DrawPhase
+		game.TurnNumber = game.TurnNumber + 1
+		return
+	}
+
+	// Detect is knock came all the way back around!
+	if game.CurrentPlayerTurn.Knocked {
+		game.GameState = Ending
+		return
+	}
+
 	player.GetPlay(game.CurrentPlayerTurn)
 
 	switch game.CurrentPlayerTurn.PlayPhase {
-	case player.DrawPhase: 
+	case player.DrawPhase:
 		{
-			// KEEP GOING FROM HERE
-			if (game.CurrentPlayerTurn.Plays[0].PlayOption)
-			game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
+			// Need to check to see if player knocked!
+			if game.CurrentPlayerTurn.Plays[0].PlayOption == player.KnockOption {
+				game.CurrentPlayerTurn.PlayPhase = player.EndPhase
+			} else {
+				game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
+
+			}
 		}
 	case player.DiscardPhase:
 		{
@@ -263,7 +314,20 @@ func Play(game *Game) {
 
 }
 
+// ===================================================================
+//
 func Process(game *Game) {
-	game.TurnNumber++
-}
 
+	biggestHand := 0
+
+	// Process who is winning!
+	for _, x := range game.Players {
+		currHandValue := player.GetHandValue(x)
+		fmt.Printf("%q has %d hand value!\n", x.Name, currHandValue)
+		if biggestHand < currHandValue {
+			biggestHand = currHandValue
+		}
+	}
+
+	fmt.Printf("Biggest hand value is %d\n", biggestHand)
+}
