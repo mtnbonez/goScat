@@ -149,11 +149,25 @@ func GetPlay(player *Player) {
 // ===================================================================
 //
 func GetHandValue(player *Player) int {
-	sum := 0
-	for _, x := range player.Hand {
-		sum = sum + x.Value
+	faceSums := map[string]int{
+		"C": 0,
+		"D": 0,
+		"H": 0,
+		"S": 0,
 	}
-	return sum
+
+	for _, x := range player.Hand {
+		faceSums[x.Suit] = faceSums[x.Suit] + x.Value
+	}
+
+	maxSum := 0
+	for _, val := range faceSums {
+		if val > maxSum {
+			maxSum = val
+		}
+	}
+
+	return maxSum
 }
 
 // ===================================================================
