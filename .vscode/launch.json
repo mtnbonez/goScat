@@ -4,14 +4,17 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+    
         {
-            "name": "Connect to server",
+            "name": "Connect to Delve",
             "type": "go",
             "request": "attach",
+            "preLaunchTask": "delve",
             "mode": "remote",
+            "cwd": "${workspaceFolder}",
             "remotePath": "${workspaceFolder}",
-            "port": 2345,
-            "host": "127.0.0.1",
+            "port": 23456,
+            "host": "127.0.0.1"
         }
     ]
 }

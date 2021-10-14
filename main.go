@@ -22,7 +22,7 @@ func main() {
 		Coins:  make([]coin.Coin, 0),
 		Hand:   make([]card.Card, 0),
 		Honor:  false,
-		Client: client.LocalClient{},
+		Client: client.NewLocalClient(),
 	}
 
 	Player2 := player.Player{
@@ -30,7 +30,7 @@ func main() {
 		Coins:  make([]coin.Coin, 0),
 		Hand:   make([]card.Card, 0),
 		Honor:  false,
-		Client: client.LocalClient{},
+		Client: client.NewLocalClient(),
 	}
 
 	Players := make([]*player.Player, 2)

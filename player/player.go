@@ -50,7 +50,7 @@ func DisplayHand(player *Player) {
 	fmt.Printf("Player hand:\n")
 	for i := range player.Hand {
 		currCard := player.Hand[i]
-		fmt.Printf("\t%q%q (%d)", currCard.Suit, currCard.Face, currCard.Value)
+		fmt.Printf("\t%s%s (%d)", currCard.Suit, currCard.Face, currCard.Value)
 	}
 	fmt.Println()
 }
@@ -59,7 +59,9 @@ func DisplayHand(player *Player) {
 //
 func GetPlay(player *Player) {
 
-	DisplayHand(player)
+	fmt.Print("\n")
+	PrettyPrintHand(player)
+	fmt.Print("\n")
 
 	switch player.PlayPhase {
 	case DrawPhase:
@@ -82,9 +84,9 @@ func GetPlay(player *Player) {
 
 	retryPlay := false
 	input := player.Client.GetInput()
-	splits := strings.Split(input, " ")
-
 	fmt.Printf("Input: %v\n", input)
+
+	splits := strings.Split(input, " ")
 	fmt.Printf("Splits: %v\n", splits)
 
 	var currPlay Play
@@ -148,6 +150,29 @@ func GetPlay(player *Player) {
 
 // ===================================================================
 //
+func PrettyPrintHand(player *Player) {
+	handSize := len(player.Hand)
+	for i := 0; i < handSize; i++ {
+		//fmt.Printf("\t")
+		fmt.Printf("┌───┐\t")
+	}
+	fmt.Printf("\n")
+	for j := 0; j < handSize; j++ {
+		fmt.Printf("│ %s │\t", player.Hand[j].Face)
+	}
+	fmt.Printf("\n")
+	for k := 0; k < handSize; k++ {
+		fmt.Printf("│ %s │\t", player.Hand[k].Suit)
+	}
+	fmt.Printf("\n")
+	for i := 0; i < handSize; i++ {
+		//fmt.Printf("\t")
+		fmt.Printf("└───┘\t")
+	}
+}
+
+// ===================================================================
+//
 func GetHandValue(player *Player) int {
 	faceSums := map[string]int{
 		"C": 0,
@@ -170,6 +195,7 @@ func GetHandValue(player *Player) int {
 	return maxSum
 }
 
+// [wferrell - 2021/10/13]: in hindsight, should probably move this to game.go
 // ===================================================================
 //
 type PlayPhase int
@@ -179,6 +205,28 @@ const (
 	DiscardPhase           = iota + 1
 	EndPhase               = iota + 1
 )
+
+// ^^ same with this helper function
+// ===================================================================
+//
+func PlayPhaseToString(phase PlayPhase) string {
+	switch phase {
+	case DrawPhase:
+		{
+			return "DrawPhase"
+		}
+	case DiscardPhase:
+		{
+			return "DiscardPhase"
+		}
+	case EndPhase:
+		{
+			return "EndPhase"
+		}
+	}
+
+	return "UNKNOWN"
+}
 
 // ===================================================================
 //

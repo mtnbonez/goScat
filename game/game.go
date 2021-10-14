@@ -253,12 +253,11 @@ func Draw(game *Game, p *player.Player, deckName string) {
 func Display(game *Game) {
 	const border = "============================================"
 	fmt.Println(border)
+	fmt.Printf("%s\tTurn %d, %s\n", game.CurrentPlayerTurn.Name, game.TurnNumber, player.PlayPhaseToString(game.CurrentPlayerTurn.PlayPhase))
 
-	fmt.Printf("\tTurn: %d\n\n", game.TurnNumber)
-
-	fmt.Printf("\tCurrPlayer: %q\n", game.CurrentPlayerTurn.Name)
-	fmt.Printf("\tPlayerHandValue: %d\n", player.GetHandValue(game.CurrentPlayerTurn))
-	fmt.Printf("\tPlayPhase: %+v\n\n", game.CurrentPlayerTurn.PlayPhase)
+	fmt.Printf("\n")
+	player.DisplayHand(game.CurrentPlayerTurn)
+	fmt.Printf("\n")
 
 	fmt.Printf("\tDrawDeckSize: %d\n", len(game.DrawDeck.Cards))
 	fmt.Printf("\tDiscardDeckSize: %d\n", len(game.DiscardDeck.Cards))

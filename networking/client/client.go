@@ -1,7 +1,8 @@
 package goscatclient
 
 import (
-	"fmt"
+	"bufio"
+	"os"
 
 	"github.com/google/uuid"
 )
@@ -46,6 +47,15 @@ type LocalClient struct {
 
 	// Client is the underlying client struct
 	Client Client
+
+	Scanner *bufio.Scanner
+}
+
+func NewLocalClient() *LocalClient {
+	client := LocalClient{
+		Scanner: bufio.NewScanner(os.Stdin),
+	}
+	return &client
 }
 
 func (client LocalClient) Connect() bool {
@@ -57,7 +67,10 @@ func (client LocalClient) Connect() bool {
 
 func (client LocalClient) GetInput() string {
 	// Here's where we interface with the UI?
-	var input string
-	fmt.Scanln(&input) ///START HERE!
-	return input
+	line := ""
+
+	if client.Scanner.Scan() {
+		line = client.Scanner.Text()
+	}
+	return line
 }
