@@ -46,6 +46,32 @@ func AddCardToHand(player *Player, card card.Card) {
 
 // ===================================================================
 //
+func RemoveCardFromHand(player *Player, card *card.Card) bool {
+	removalIndex := -1
+
+	for i, x := range player.Hand {
+		if (x.Face == card.Face) && (x.Suit == card.Suit) {
+			removalIndex = i
+		}
+	}
+
+	fmt.Printf("Removal Index = %d\n", removalIndex)
+
+	if removalIndex == -1 {
+		fmt.Printf("Card not found in hand! %+v\n", card)
+	} else {
+		//not order perserving!
+		player.Hand[removalIndex] = player.Hand[len(player.Hand)-1]
+		player.Hand = player.Hand[:len(player.Hand)-1]
+		return true
+	}
+
+	fmt.Printf("Cannot remove Card! %+v\n", card)
+	return false
+}
+
+// ===================================================================
+//
 func DisplayHand(player *Player) {
 	fmt.Printf("Player hand:\n")
 	for i := range player.Hand {
@@ -58,6 +84,8 @@ func DisplayHand(player *Player) {
 // ===================================================================
 //
 func GetPlay(player *Player) {
+
+	fmt.Printf("\n%s's turn!", player.Name)
 
 	fmt.Print("\n")
 	PrettyPrintHand(player)
@@ -123,8 +151,8 @@ func GetPlay(player *Player) {
 			}
 
 			// TODO - validate!
-			var suit = string(splits[1])
-			var face = string(splits[2])
+			var face = string(splits[1])
+			var suit = string(splits[2])
 
 			currPlay.Card = card.Card{
 				Face: face,
@@ -154,20 +182,25 @@ func PrettyPrintHand(player *Player) {
 	handSize := len(player.Hand)
 	for i := 0; i < handSize; i++ {
 		//fmt.Printf("\t")
-		fmt.Printf("┌───┐\t")
+		fmt.Printf("┌────┐  ")
 	}
 	fmt.Printf("\n")
 	for j := 0; j < handSize; j++ {
-		fmt.Printf("│ %s │\t", player.Hand[j].Face)
+		if len(player.Hand[j].Face) > 1 {
+			fmt.Printf("│ %s │  ", player.Hand[j].Face)
+		} else {
+			fmt.Printf("│ %s  │  ", player.Hand[j].Face)
+		}
+
 	}
 	fmt.Printf("\n")
 	for k := 0; k < handSize; k++ {
-		fmt.Printf("│ %s │\t", player.Hand[k].Suit)
+		fmt.Printf("│  %s │  ", card.SuitToSymbol(player.Hand[k]))
 	}
 	fmt.Printf("\n")
 	for i := 0; i < handSize; i++ {
 		//fmt.Printf("\t")
-		fmt.Printf("└───┘\t")
+		fmt.Printf("└────┘  ")
 	}
 }
 

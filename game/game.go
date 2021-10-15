@@ -2,6 +2,7 @@ package goscatgame
 
 import (
 	"fmt"
+	card "goscat/card"
 	deck "goscat/deck"
 	player "goscat/player"
 
@@ -247,6 +248,16 @@ func Draw(game *Game, p *player.Player, deckName string) {
 	player.AddCardToHand(p, cardPulled)
 }
 
+// ===================================================================
+//
+func Discard(game *Game, p *player.Player, card *card.Card) {
+	if player.RemoveCardFromHand(p, card) {
+		deck.Discard(&game.DiscardDeck, card)
+	} else {
+		fmt.Printf("Unable to discard card!\n")
+	}
+}
+
 // Display should really go to it's own implementation
 // ===================================================================
 //
@@ -255,16 +266,68 @@ func Display(game *Game) {
 	fmt.Println(border)
 	fmt.Printf("%s\tTurn %d, %s\n", game.CurrentPlayerTurn.Name, game.TurnNumber, player.PlayPhaseToString(game.CurrentPlayerTurn.PlayPhase))
 
-	fmt.Printf("\n")
-	player.DisplayHand(game.CurrentPlayerTurn)
-	fmt.Printf("\n")
+	//fmt.Printf("\n")
+	//player.DisplayHand(game.CurrentPlayerTurn)
+	//fmt.Printf("\n")
 
 	fmt.Printf("\tDrawDeckSize: %d\n", len(game.DrawDeck.Cards))
 	fmt.Printf("\tDiscardDeckSize: %d\n", len(game.DiscardDeck.Cards))
-	topCard := game.DiscardDeck.Cards[0]
-	fmt.Printf("\tDiscard Pile: %q%q (%d)\n", topCard.Suit, topCard.Face, topCard.Value)
+
+	drawTopCard := game.DrawDeck.Cards[0]
+	fmt.Printf("\tDraw Pile: %s%s (%d)\n", drawTopCard.Suit, drawTopCard.Face, drawTopCard.Value)
+
+	var discardTopCard card.Card
+
+	if len(game.DiscardDeck.Cards) > 0 {
+		discardTopCard = game.DiscardDeck.Cards[0]
+
+	} else {
+		discardTopCard = card.Card{
+			Suit:  "X",
+			Face:  "X",
+			Value: 0,
+		}
+	}
+	fmt.Printf("\tDiscard Pile: %s%s (%d)\n", discardTopCard.Suit, discardTopCard.Face, discardTopCard.Value)
 
 	fmt.Println(border)
+
+	//Play around with stuff for the deck representations
+
+	fmt.Printf("    ┌────┐  ┌────┐\n")
+
+	//let's count the number of spaces we need
+	discardSpace := false
+	drawSpace := false
+	if len(game.DiscardDeck.Cards) > 0 {
+		if len(game.DiscardDeck.Cards[0].Face) > 1 {
+			discardSpace = true
+		}
+	}
+
+	if len(game.DrawDeck.Cards[0].Face) > 1 {
+		drawSpace = true
+	}
+
+	// Face value
+	if drawSpace {
+		fmt.Printf("    │ %s │  ", drawTopCard.Face)
+	} else {
+		fmt.Printf("    │ %s  │  ", drawTopCard.Face)
+	}
+
+	if discardSpace {
+		fmt.Printf("│ %s │\n", discardTopCard.Face)
+	} else {
+		fmt.Printf("│ %s  │\n", discardTopCard.Face)
+	}
+
+	// Suit value
+	fmt.Printf("    │  %s │  │  %s │\n", card.SuitToSymbol(drawTopCard), card.SuitToSymbol(discardTopCard))
+
+	fmt.Printf("    └────┘  └────┘\n")
+
+	fmt.Printf("   Draw       Discard\n")
 
 }
 
@@ -298,16 +361,18 @@ func Play(game *Game) {
 	case player.DrawPhase:
 		{
 			// Need to check to see if player knocked!
-			if game.CurrentPlayerTurn.Plays[0].PlayOption == player.KnockOption {
+			if game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].PlayOption == player.KnockOption {
 				game.CurrentPlayerTurn.PlayPhase = player.EndPhase
 			} else {
+				// Else, they've drawn
 				game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
-
+				Draw(game, game.CurrentPlayerTurn, game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].Deck)
 			}
 		}
 	case player.DiscardPhase:
 		{
 			game.CurrentPlayerTurn.PlayPhase = player.EndPhase
+			Discard(game, game.CurrentPlayerTurn, &game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].Card)
 		}
 	}
 
@@ -322,7 +387,7 @@ func Process(game *Game) {
 	// Process who is winning!
 	for _, x := range game.Players {
 		currHandValue := player.GetHandValue(x)
-		fmt.Printf("%q has %d hand value!\n", x.Name, currHandValue)
+		fmt.Printf("%s has %d hand value!\n", x.Name, currHandValue)
 		if biggestHand < currHandValue {
 			biggestHand = currHandValue
 		}

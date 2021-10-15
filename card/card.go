@@ -11,3 +11,26 @@ type Card struct {
 	// Value represents how many points the card is worth
 	Value int
 }
+
+func SuitToSymbol(card Card) string {
+	switch card.Suit {
+	case "S":
+		{
+			return "♠️"
+		}
+	case "H":
+		{
+			return "♥️"
+		}
+	case "C":
+		{
+			return "♣️"
+		}
+	case "D":
+		{
+			return "♦️"
+		}
+	}
+
+	return "?"
+}
