@@ -28,6 +28,9 @@ const (
 
 // ===================================================================
 //
+
+// ===================================================================
+//
 type Game struct {
 
 	// UUID of the game (could use for secret initially?)
@@ -250,12 +253,15 @@ func Draw(game *Game, p *player.Player, deckName string) {
 
 // ===================================================================
 //
-func Discard(game *Game, p *player.Player, card *card.Card) {
+func Discard(game *Game, p *player.Player, card *card.Card) bool {
 	if player.RemoveCardFromHand(p, card) {
 		deck.Discard(&game.DiscardDeck, card)
+		return true
 	} else {
 		fmt.Printf("Unable to discard card!\n")
 	}
+
+	return false
 }
 
 // Display should really go to it's own implementation
@@ -264,6 +270,7 @@ func Discard(game *Game, p *player.Player, card *card.Card) {
 func Display(game *Game) {
 	const border = "============================================"
 	fmt.Println(border)
+	fmt.Printf("ID=%s\n", game.ID.String())
 	fmt.Printf("%s\tTurn %d, %s\n", game.CurrentPlayerTurn.Name, game.TurnNumber, player.PlayPhaseToString(game.CurrentPlayerTurn.PlayPhase))
 
 	//fmt.Printf("\n")
@@ -355,24 +362,31 @@ func Play(game *Game) {
 		return
 	}
 
-	player.GetPlay(game.CurrentPlayerTurn)
+	loop := true
 
-	switch game.CurrentPlayerTurn.PlayPhase {
-	case player.DrawPhase:
-		{
-			// Need to check to see if player knocked!
-			if game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].PlayOption == player.KnockOption {
-				game.CurrentPlayerTurn.PlayPhase = player.EndPhase
-			} else {
-				// Else, they've drawn
-				game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
-				Draw(game, game.CurrentPlayerTurn, game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].Deck)
+	for loop {
+		player.GetPlay(game.CurrentPlayerTurn)
+
+		switch game.CurrentPlayerTurn.PlayPhase {
+		case player.DrawPhase:
+			{
+				// Need to check to see if player knocked!
+				if game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].PlayOption == player.KnockOption {
+					game.CurrentPlayerTurn.PlayPhase = player.EndPhase
+				} else {
+					// Else, they've drawn
+					game.CurrentPlayerTurn.PlayPhase = player.DiscardPhase
+					Draw(game, game.CurrentPlayerTurn, game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].Deck)
+				}
+				loop = false
 			}
-		}
-	case player.DiscardPhase:
-		{
-			game.CurrentPlayerTurn.PlayPhase = player.EndPhase
-			Discard(game, game.CurrentPlayerTurn, &game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].Card)
+		case player.DiscardPhase:
+			{
+				if Discard(game, game.CurrentPlayerTurn, &game.CurrentPlayerTurn.Plays[len(game.CurrentPlayerTurn.Plays)-1].Card) {
+					game.CurrentPlayerTurn.PlayPhase = player.EndPhase
+					loop = false
+				}
+			}
 		}
 	}
 

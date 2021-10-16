@@ -1,0 +1,30 @@
+Finish up UI! 
+
+Complete 1v1 local play
+
+Work on Telnet connectivity
+    https://github.com/reiver/go-telnet
+    Server mode?
+
+Multiple games per application 
+    gameManager that iterates through a pool of games?
+
+Proper Knock mechanics 
+    Right now, you can Knock on your first turn :) 
+
+Conceal the 'Draw' deck 
+    It shows what card you may get
+
+✔️ Redo discard option selection if it fails from bad input
+    Loop that shit
+
+Correct cleanup of game when 'ff'ing
+
+Make conversion of GameState to string 
+    Check out gamemanager.go for more insight
+
+Sanitize "draw" input 
+    Can cause a panic if the right inputs aren't used
+
+Check out "discard" failed input causing a player switch unintentionally
+    If I mess up the input, the 2nd attempt may be targeting the other player

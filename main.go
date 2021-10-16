@@ -8,7 +8,32 @@ import (
 	player "goscat/player"
 )
 
+// ===================================================================
+//
 func main() {
+
+	gameManager := game.GameManager{}
+	game.InitManager(&gameManager)
+
+	testGameOne := CreateTestGame("p1", "p2")
+	testGameTwo := CreateTestGame("p3", "p4")
+
+	game.AddGame(&gameManager, &testGameOne)
+	game.AddGame(&gameManager, &testGameTwo)
+
+	// Check for finish
+	for {
+
+		game.ProcessManager(&gameManager)
+
+		// Any Scats?
+	}
+
+}
+
+// ===================================================================
+//
+func CreateTestGame(p1 string, p2 string) game.Game {
 	// Define a game
 	testGame := game.Game{}
 
@@ -18,7 +43,7 @@ func main() {
 
 	// Attach two local players players
 	Player1 := player.Player{
-		Name:   "p1",
+		Name:   p1,
 		Coins:  make([]coin.Coin, 0),
 		Hand:   make([]card.Card, 0),
 		Honor:  false,
@@ -26,7 +51,7 @@ func main() {
 	}
 
 	Player2 := player.Player{
-		Name:   "p2",
+		Name:   p2,
 		Coins:  make([]coin.Coin, 0),
 		Hand:   make([]card.Card, 0),
 		Honor:  false,
@@ -49,27 +74,5 @@ func main() {
 	game.Deal(&testGame)
 	game.StartGame(&testGame)
 
-	// Check for finish
-	for {
-		if testGame.GameState == game.Ending {
-			break
-		}
-
-		// Display game board
-		game.Display(&testGame)
-
-		// Process input
-		game.Play(&testGame)
-
-		// Process game
-		game.Process(&testGame)
-
-		// Any Scats?
-
-		// Process status
-
-		// psst, this is broke on purpose
-
-	}
-
+	return testGame
 }

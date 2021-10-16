@@ -5,6 +5,7 @@ import (
 	card "goscat/card"
 	coin "goscat/coin"
 	client "goscat/networking/client"
+	"os"
 	"strings"
 )
 
@@ -130,9 +131,14 @@ func GetPlay(player *Player) {
 				}
 			case "knock":
 				{
-					fmt.Printf("%q just knocked!!!\n", player.Name)
+					fmt.Printf("%s just knocked!!!\n", player.Name)
 					player.Knocked = true
 					currPlay.PlayOption = KnockOption
+				}
+			case "ff":
+				{
+					fmt.Printf("%s has forfeited!", player.Name)
+					os.Exit(1)
 				}
 			default:
 				{

@@ -5,6 +5,8 @@ import (
 	card "goscat/card"
 	"math/rand"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // Deck is used for deques of cards
@@ -29,7 +31,9 @@ func Discard(d *Deck, c *card.Card) {
 }
 
 func Shuffle(d *Deck) {
-	rand.Seed(time.Now().Unix())
+	//trying out uuid stuff for random seed
+	test := uuid.New()
+	rand.Seed(time.Now().Unix() + int64(test.ID()))
 	dest := make([]card.Card, len(d.Cards))
 	perm := rand.Perm(len(d.Cards))
 	for i, v := range perm {
