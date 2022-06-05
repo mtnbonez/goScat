@@ -15,6 +15,18 @@
             "remotePath": "${workspaceFolder}",
             "port": 23456,
             "host": "127.0.0.1"
+        },
+        {
+            "name": "Connect to external session",
+            "type": "go",
+            "debugAdapter": "dlv-dap",
+            "request": "attach",
+            "mode": "remote",
+            "port": 12345,
+            "host": "127.0.0.1",
+            //"substitutePath": [
+            //    { "from": "${workspaceFolder}", "to": "."},
+            //]
         }
     ]
 }

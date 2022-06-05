@@ -301,7 +301,7 @@ func Display(game *Game) {
 
 	//Play around with stuff for the deck representations
 
-	fmt.Printf("    ┌────┐  ┌────┐\n")
+	fmt.Printf("    ┌─────┐  ┌─────┐\n")
 
 	//let's count the number of spaces we need
 	discardSpace := false
@@ -318,21 +318,21 @@ func Display(game *Game) {
 
 	// Face value
 	if drawSpace {
-		fmt.Printf("    │ %s │  ", drawTopCard.Face)
-	} else {
 		fmt.Printf("    │ %s  │  ", drawTopCard.Face)
+	} else {
+		fmt.Printf("    │ %s   │  ", drawTopCard.Face)
 	}
 
 	if discardSpace {
-		fmt.Printf("│ %s │\n", discardTopCard.Face)
-	} else {
 		fmt.Printf("│ %s  │\n", discardTopCard.Face)
+	} else {
+		fmt.Printf("│ %s   │\n", discardTopCard.Face)
 	}
 
 	// Suit value
 	fmt.Printf("    │  %s │  │  %s │\n", card.SuitToSymbol(drawTopCard), card.SuitToSymbol(discardTopCard))
 
-	fmt.Printf("    └────┘  └────┘\n")
+	fmt.Printf("    └─────┘  └─────┘\n")
 
 	fmt.Printf("   Draw       Discard\n")
 

@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	card "goscat/card"
 	coin "goscat/coin"
 	game "goscat/game"
 	client "goscat/networking/client"
 	player "goscat/player"
+	"os"
 )
 
 // ===================================================================
@@ -16,19 +18,22 @@ func main() {
 	game.InitManager(&gameManager)
 
 	testGameOne := CreateTestGame("p1", "p2")
-	testGameTwo := CreateTestGame("p3", "p4")
+	//testGameTwo := CreateTestGame("p3", "p4")
 
 	game.AddGame(&gameManager, &testGameOne)
-	game.AddGame(&gameManager, &testGameTwo)
+	//game.AddGame(&gameManager, &testGameTwo)
 
 	// Check for finish
-	for {
+	for gameManager.GetActiveAndReportingGames() {
 
 		game.ProcessManager(&gameManager)
 
 		// Any Scats?
 	}
 
+	// Quick STDIN to keep from closing window
+	reader := bufio.NewReader(os.Stdin)
+	reader.ReadString('\n')
 }
 
 // ===================================================================

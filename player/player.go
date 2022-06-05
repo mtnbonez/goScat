@@ -188,14 +188,14 @@ func PrettyPrintHand(player *Player) {
 	handSize := len(player.Hand)
 	for i := 0; i < handSize; i++ {
 		//fmt.Printf("\t")
-		fmt.Printf("┌────┐  ")
+		fmt.Printf("┌─────┐  ")
 	}
 	fmt.Printf("\n")
 	for j := 0; j < handSize; j++ {
 		if len(player.Hand[j].Face) > 1 {
-			fmt.Printf("│ %s │  ", player.Hand[j].Face)
-		} else {
 			fmt.Printf("│ %s  │  ", player.Hand[j].Face)
+		} else {
+			fmt.Printf("│ %s   │  ", player.Hand[j].Face)
 		}
 
 	}
@@ -206,7 +206,7 @@ func PrettyPrintHand(player *Player) {
 	fmt.Printf("\n")
 	for i := 0; i < handSize; i++ {
 		//fmt.Printf("\t")
-		fmt.Printf("└────┘  ")
+		fmt.Printf("└─────┘  ")
 	}
 }
 

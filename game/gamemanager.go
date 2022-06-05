@@ -30,12 +30,18 @@ func InitManager(manager *GameManager) {
 
 // ===================================================================
 //
+func (manager *GameManager) GetActiveAndReportingGames() bool {
+
+	return len(manager.ActiveGames) > 0 || len(manager.ReportGames) > 0
+}
+
+// ===================================================================
+//
 func ProcessManager(manager *GameManager) {
 
 	//Do we have any games?
 	if len(manager.ActiveGames) < 1 {
 		fmt.Printf("No active games!\n")
-		return
 	} else {
 		if !ProcessActiveGame(manager, manager.ActiveGames[manager.ActiveIter]) {
 			fmt.Printf("Processing ACTIVE game_id: %s failed!\n", manager.ActiveGames[manager.ActiveIter].ID)
@@ -52,7 +58,6 @@ func ProcessManager(manager *GameManager) {
 
 	if len(manager.ReportGames) < 1 {
 		fmt.Printf("No reporting games!\n")
-		return
 	} else {
 		if !ProcessReportGame(manager, manager.ReportGames[manager.ReportIter]) {
 			fmt.Printf("Process REPORT game_id: %s failed!\n", manager.ReportGames[manager.ReportIter].ID)
@@ -123,8 +128,8 @@ func ProcessActiveGame(manager *GameManager, currGame *Game) bool {
 //
 func ProcessReportGame(manager *GameManager, currGame *Game) bool {
 
-	if manager.ReportIter > (len(manager.ActiveGames) - 1) {
-		fmt.Printf("GameIter (%d) is higher than len-1 of ActiveGames (%d)\n", manager.ActiveIter, (len(manager.ActiveGames) - 1))
+	if manager.ReportIter > (len(manager.ReportGames) - 1) {
+		fmt.Printf("ReportIter (%d) is higher than len-1 of ReportGames (%d)\n", manager.ReportIter, (len(manager.ReportGames) - 1))
 		return false
 	}
 
@@ -133,6 +138,8 @@ func ProcessReportGame(manager *GameManager, currGame *Game) bool {
 		{
 			//Do logic for end of game here!
 			fmt.Printf("%s has been reported!\n", currGame.ID.String())
+			manager.ReportGames = append(manager.ReportGames[:manager.ReportIter], manager.ReportGames[manager.ReportIter+1:]...)
+			return true
 		}
 	}
 
