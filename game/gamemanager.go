@@ -94,12 +94,13 @@ func ProcessActiveGame(manager *GameManager, currGame *Game) bool {
 			Play(currGame)
 
 			// Process game
-			Process(currGame)
+			Process(currGame, false)
 
 			return true
 		}
 	case Ending:
 		{
+			Process(currGame, true)
 			// Move game to reporting state
 			fmt.Printf("%s:%d to Report\n", currGame.ID.String(), currGame.GameState)
 			currGame.GameState = Report

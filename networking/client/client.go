@@ -33,9 +33,7 @@ type IPClient struct {
 }
 
 func (client IPClient) Connect() bool {
-
 	// TODO!
-
 	return false
 }
 
@@ -44,7 +42,6 @@ func (client IPClient) GetInput() string {
 }
 
 type LocalClient struct {
-
 	// Client is the underlying client struct
 	Client Client
 
@@ -59,9 +56,7 @@ func NewLocalClient() *LocalClient {
 }
 
 func (client LocalClient) Connect() bool {
-
 	// Legit just connect, bro.
-
 	return true
 }
 

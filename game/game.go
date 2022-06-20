@@ -28,9 +28,6 @@ const (
 
 // ===================================================================
 //
-
-// ===================================================================
-//
 type Game struct {
 
 	// UUID of the game (could use for secret initially?)
@@ -394,18 +391,32 @@ func Play(game *Game) {
 
 // ===================================================================
 //
-func Process(game *Game) {
+func Process(game *Game, endGameCheck bool) {
 
 	biggestHand := 0
+	winningPlayer := 0
+	tie := false
 
 	// Process who is winning!
-	for _, x := range game.Players {
+	for i, x := range game.Players {
 		currHandValue := player.GetHandValue(x)
 		fmt.Printf("%s has %d hand value!\n", x.Name, currHandValue)
-		if biggestHand < currHandValue {
+
+		if i > 0 && biggestHand == currHandValue {
+			tie = true
+		} else if biggestHand < currHandValue {
 			biggestHand = currHandValue
+			winningPlayer = i
 		}
 	}
 
+	// DEBUG
 	fmt.Printf("Biggest hand value is %d\n", biggestHand)
+	if endGameCheck {
+		if tie {
+			fmt.Printf("Tie!\n")
+		} else {
+			fmt.Printf("Player %d wins!\n", winningPlayer+1)
+		}
+	}
 }
