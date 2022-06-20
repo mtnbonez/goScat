@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package game;
+
+message UUID {
+    string uuid = 1; 
+}
+
+message Player {
+    string player_name = 1;
+}
+
+message Game {
+    UUID uuid = 1;
+    repeated Player = 2;
+}
+
+message CreateGame {
+    Player player = 1;
+}
+
+service GameService {
+    rpc CreateGame (CreateGameRequest) returns (CreateGameResponse) {}
+}
