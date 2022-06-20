@@ -12,13 +12,40 @@ message Player {
 
 message Game {
     UUID uuid = 1;
-    repeated Player = 2;
+    repeated Player player = 2;
 }
 
-message CreateGame {
+// Find a game currently being hosted
+message FindGameRequest {
     Player player = 1;
+}
+
+message FindGameResponse {
+    UUID uuid = 1;
+    repeated Player player = 2;
+}
+
+// Join a specific game (designated by UUID)
+message JoinGameRequest {
+    UUID uuid = 1;
+    Player player = 2;
+}
+
+message JoinGameResponse {
+    repeated Player = 1;
+}
+
+// Create a new game
+message CreateGameRequest {
+    Player player = 1;
+}
+
+message CreateGameResponse {
+    UUID uuid = 1;
 }
 
 service GameService {
     rpc CreateGame (CreateGameRequest) returns (CreateGameResponse) {}
+    rpc JoinGame (JoinGameRequest) returns (JoinGameResponse) {}
+    rpc FindGame (FindGameRequest) returns (FindGameResponse) {} 
 }
