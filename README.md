@@ -1,7 +1,7 @@
 # goScat
 Text-based, Go implementation of the [(in)famous card game](https://en.wikipedia.org/wiki/Scat_(card_game)).
 
-# Deployment
+# Local Dev Setup
 
 ## Minikube
 
@@ -48,4 +48,12 @@ Afterwards, you can view your newly built image in the Docker image list:
 > docker image ls
 ```
 
-> If you get complaints about file space, you can do a quick prune of the unused images doing `docker images prune`
+> If you get complaints about file space, you can do a quick prune of the unused images doing `docker image prune`
+
+
+# Deployment
+
+## Deploying Locally in Minikube 
+
+After you have your image built, you can run the Kubernetes deploment `.yaml`s to set up a basic local version of the game. 
+
