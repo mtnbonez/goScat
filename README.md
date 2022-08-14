@@ -5,7 +5,7 @@ Text-based, Go implementation of the [(in)famous card game](https://en.wikipedia
 
 ## Minikube
 
-[Minikube]() is a great tool to spin up a local VM & host a local Kubernetes cluster, regardless of your base platform
+[Minikube](https://minikube.sigs.k8s.io/docs/start/) is a great tool to spin up a local VM & host a local Kubernetes cluster, regardless of your base platform
 
 > I highly recommend looking into the Hyper-V driver for Minikube if you're on Windows and you're working on projects outside of Docker Desktop's terms for free-use. 
 
