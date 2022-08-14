@@ -1,4 +1,4 @@
-package goscatgame
+package game
 
 import (
 	"fmt"
@@ -91,7 +91,7 @@ func ProcessActiveGame(manager *GameManager, currGame *Game) bool {
 			Display(currGame)
 
 			// Process input
-			Play(currGame)
+			PlayStep(currGame)
 
 			// Process game
 			Process(currGame, false)
